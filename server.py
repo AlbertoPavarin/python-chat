@@ -13,6 +13,12 @@ DISC_MSG = "!DISC!"
 CONNECTED = True
 connections = []
 
+"""
+    To implement :
+        - when a user connects the server shows to him the list of user currently in the server
+        ...
+"""
+
 def client_connection(comm_sock, remote_addr):
     global connections
     username = comm_sock.recv(1024).decode(FORMAT)
