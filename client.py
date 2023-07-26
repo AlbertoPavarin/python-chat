@@ -1,6 +1,5 @@
 import socket
 import sys
-import signal
 from functools import partial
 
 # COSTANTS

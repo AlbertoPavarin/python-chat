@@ -23,7 +23,7 @@ def client_connection(comm_sock, remote_addr):
             break
         comm_sock.send("Message received".encode(FORMAT))
 
-def signal_handler(server, signal, frame):
+def signal_handler(server, connections, signal, frame):
     """
     handler for SIGINT, closes the server socket and quits the program
 
@@ -39,11 +39,19 @@ def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # socket creation
     server.bind(SOCK)
 
-    signal.signal(signal.SIGINT, partial(signal_handler, server))
+    connections = []
+
+    signal.signal(signal.SIGINT, partial(signal_handler, server, connections))
 
     server.listen()
     while CONNECTED:
         comm_sock, remote_addr = server.accept() # accept a comunication
+        connections.append(
+            {
+                'socket': comm_sock,
+                'address': remote_addr
+            }
+        ) 
         threading.Thread(target=client_connection, args=(comm_sock, remote_addr)).start()
         """creates and starts a ne thread to handle a connection, 
            providing multiple connection at the same time"""
