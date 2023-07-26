@@ -1,5 +1,7 @@
 import socket
 import sys
+import signal
+import threading
 from functools import partial
 
 # COSTANTS
@@ -9,8 +11,10 @@ SOCK = (ADDRESS, SERVER_PORT) # tuple used for connection (x.y.z.k, ####)
 FORMAT = 'utf-8' # format with which message are encoded and decoded
 DISC_MSG = "!DISC!"
 CONNECTED = True
+run = True
 
 def signal_handler(client, signal, frame):
+    global run
     """
     handler for SIGINT, close the connection to the server and quit the program
 
@@ -20,7 +24,33 @@ def signal_handler(client, signal, frame):
     """
     client.send(DISC_MSG.encode(FORMAT))
     client.close()
-    sys.exit("Disconnected")
+    run = False
+    print("\nPress Enter to exit")
+        
+
+def receive(client):
+    global run
+    while run:
+        try:
+            msg = client.recv(1024).decode(FORMAT)
+            print(f'{ADDRESS}: {msg}')
+            if msg == DISC_MSG:
+                client.close()
+                print("\nServer closed\nPress Enter to exit")
+                break
+        except:
+            break
+
+def write(client):
+    global run
+    while run:
+        try:
+            msg = input()
+            client.send(msg.encode(FORMAT))
+            if msg == DISC_MSG:
+                client.close()
+        except:
+            break
 
 def main():
 
@@ -31,16 +61,8 @@ def main():
 
     print(f'{ADDRESS}: {client.recv(1024).decode(FORMAT)}')
 
-    while CONNECTED:
-        msg = input("Type: ")
-        if msg == DISC_MSG:
-            client.send(msg.encode(FORMAT))
-            client.close()
-            sys.exit("Disconnected")
-
-        client.send(msg.encode(FORMAT))
-        print(f'{ADDRESS}: {client.recv(1024).decode(FORMAT)}')
-
+    threading.Thread(target=receive, args=(client,)).start()
+    threading.Thread(target=write, args=(client,)).start()
 
 if __name__ == "__main__":
     main()

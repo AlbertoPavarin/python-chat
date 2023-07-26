@@ -32,6 +32,8 @@ def signal_handler(server, connections, signal, frame):
     :param :frame stack frame, memory zone, which containes datas needed by the executing subroutine
     """
     # should close every connection, then exit, to implement
+    for connection in connections:
+        connection['socket'].send(DISC_MSG.encode(FORMAT))
     server.close()
     sys.exit("Server closed")
 
