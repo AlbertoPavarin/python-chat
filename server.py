@@ -49,12 +49,12 @@ def signal_handler(server, connections, signal, frame):
     server.close()
     sys.exit("Server closed")
 
-def send_to_all(sender, msg):
+def send_to_all(sender, msg): # send the messages in broadcasr, to everyone in the chat
     for connection in connections:
         if connection['username'] != sender['username']:
             connection['socket'].sendall(f"{sender['username']}: {msg}".encode(FORMAT))
         
-def join_alert(username):
+def join_alert(username): # send a message that says a user joined
     for connection in connections:
         if connection['username'] != username:
             connection['socket'].sendall(f"SERVER: {username} joined".encode(FORMAT))

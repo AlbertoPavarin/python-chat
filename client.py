@@ -26,9 +26,13 @@ def signal_handler(client, signal, frame):
     client.close()
     run = False
     print("\nPress Enter to exit")
+
+def set_username():
+    username = input("Choose a username: ")
+    return username
         
 
-def receive(client):
+def receive(client): # function to receive messages
     global run
     while run:
         try:
@@ -41,7 +45,7 @@ def receive(client):
         except:
             break
 
-def write(client):
+def write(client): # function to send messages
     global run
     while run:
         try:
@@ -53,7 +57,7 @@ def write(client):
             break
 
 def main():
-    username = input("Choose a username: ")
+    username = set_username()
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # creation of the socket
     
     try:
