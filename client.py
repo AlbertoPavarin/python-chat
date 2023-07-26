@@ -53,11 +53,17 @@ def write(client):
             break
 
 def main():
-
+    username = input("Choose a username: ")
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # creation of the socket
-    client.connect(SOCK) # connection to server
+    
+    try:
+        client.connect(SOCK) # connection to server
+    except ConnectionRefusedError:
+        sys.exit("Connection Error")
 
     signal.signal(signal.SIGINT, partial(signal_handler, client))
+
+    client.sendall(username.encode(FORMAT))
 
     print(f'{ADDRESS}: {client.recv(1024).decode(FORMAT)}')
 

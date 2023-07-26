@@ -11,14 +11,25 @@ SOCK = (ADDRESS, SERVER_PORT) # tuple used for connection (x.y.z.k, ####)
 FORMAT = 'utf-8' # format with which message are encoded and decoded
 DISC_MSG = "!DISC!"
 CONNECTED = True
+connections = []
 
 def client_connection(comm_sock, remote_addr):
-    print(f"Conected with {remote_addr}")
+    global connections
+    username = comm_sock.recv(1024).decode(FORMAT)
+    user = {
+        'socket': comm_sock,
+        'address': remote_addr,
+        'username': username
+    }
+    connections.append(user) 
+    print(f"Conected with {user['username']}")
     comm_sock.send("Connected with server".encode(FORMAT))
     while True:
         msg = comm_sock.recv(1024).decode(FORMAT)
-        print(f'{remote_addr}: {msg}')
+        print(f'{username}: {msg}')
+        send_to_all(user, msg)
         if msg == DISC_MSG:
+            connections.remove(user)
             comm_sock.close()
             break
         comm_sock.send("Message received".encode(FORMAT))
@@ -37,23 +48,23 @@ def signal_handler(server, connections, signal, frame):
     server.close()
     sys.exit("Server closed")
 
+def send_to_all(sender, msg):
+    for connection in connections:
+        if connection['username'] != sender['username']:
+            connection['socket'].sendall(f"{sender['username']}: {msg}".encode(FORMAT))
+        
+
+
 def main():
+    global connections
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # socket creation
     server.bind(SOCK)
-
-    connections = []
 
     signal.signal(signal.SIGINT, partial(signal_handler, server, connections))
 
     server.listen()
     while CONNECTED:
         comm_sock, remote_addr = server.accept() # accept a comunication
-        connections.append(
-            {
-                'socket': comm_sock,
-                'address': remote_addr
-            }
-        ) 
         threading.Thread(target=client_connection, args=(comm_sock, remote_addr)).start()
         """creates and starts a ne thread to handle a connection, 
            providing multiple connection at the same time"""
