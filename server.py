@@ -16,6 +16,7 @@ connections = []
 def client_connection(comm_sock, remote_addr):
     global connections
     username = comm_sock.recv(1024).decode(FORMAT)
+    join_alert(username)
     user = {
         'socket': comm_sock,
         'address': remote_addr,
@@ -32,7 +33,7 @@ def client_connection(comm_sock, remote_addr):
             connections.remove(user)
             comm_sock.close()
             break
-        comm_sock.send("Message received".encode(FORMAT))
+        comm_sock.send("SERVER: Message received".encode(FORMAT))
 
 def signal_handler(server, connections, signal, frame):
     """
@@ -53,7 +54,10 @@ def send_to_all(sender, msg):
         if connection['username'] != sender['username']:
             connection['socket'].sendall(f"{sender['username']}: {msg}".encode(FORMAT))
         
-
+def join_alert(username):
+    for connection in connections:
+        if connection['username'] != username:
+            connection['socket'].sendall(f"SERVER: {username} joined".encode(FORMAT))
 
 def main():
     global connections

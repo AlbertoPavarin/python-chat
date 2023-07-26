@@ -33,7 +33,7 @@ def receive(client):
     while run:
         try:
             msg = client.recv(1024).decode(FORMAT)
-            print(f'{ADDRESS}: {msg}')
+            print(f'{msg}')
             if msg == DISC_MSG:
                 client.close()
                 print("\nServer closed\nPress Enter to exit")
