@@ -15,7 +15,6 @@ connections = []
 
 """
     To implement :
-        - when a user connects the server shows to him the list of user currently in the server
         ...
 """
 
@@ -31,6 +30,9 @@ def client_connection(comm_sock, remote_addr):
     connections.append(user) 
     print(f"Conected with {user['username']}")
     comm_sock.send("Connected with server".encode(FORMAT))
+    comm_sock.send("\nUser connected:\n".encode(FORMAT))
+    for conn in connections:
+        comm_sock.send(f" - {conn['username']}\n".encode(FORMAT))
     while True:
         msg = comm_sock.recv(1024).decode(FORMAT)
         print(f'{username}: {msg}')

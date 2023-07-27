@@ -53,6 +53,7 @@ def write(client): # function to send messages
             client.send(msg.encode(FORMAT))
             if msg == DISC_MSG:
                 client.close()
+                break
         except:
             break
 
