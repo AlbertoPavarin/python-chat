@@ -30,6 +30,16 @@ def signal_handler(client, signal, frame):
 def set_username():
     username = input("Choose a username: ")
     return username
+
+def create_scoket():
+    return socket.socket(socket.AF_INET, socket.SOCK_STREAM) # creation of the socket
+
+def connect_to_server(client):   
+    try:
+        client.connect(SOCK) # connection to server
+        return True
+    except ConnectionRefusedError:
+        sys.exit("Connection Error")
         
 
 def receive(client): # function to receive messages
@@ -59,12 +69,10 @@ def write(client): # function to send messages
 
 def main():
     username = set_username()
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # creation of the socket
-    
-    try:
-        client.connect(SOCK) # connection to server
-    except ConnectionRefusedError:
-        sys.exit("Connection Error")
+
+    client = create_scoket()
+
+    connect_to_server(client)
 
     signal.signal(signal.SIGINT, partial(signal_handler, client))
 

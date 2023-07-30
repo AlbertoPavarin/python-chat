@@ -4,19 +4,17 @@ import signal
 import sys
 from functools import partial
 
+def get_ip_address():
+    return socket.gethostbyname(socket.gethostname())
+
 # COSTANTS
-ADDRESS = socket.gethostbyname(socket.gethostname()) # SERVER address, pc address bc server and client are in the same PC
+ADDRESS =  get_ip_address() # SERVER address, pc address bc server and client are in the same PC
 SERVER_PORT = 2222 # port number to connect to server
 SOCK = (ADDRESS, SERVER_PORT) # tuple used for connection (x.y.z.k, ####)
 FORMAT = 'utf-8' # format with which message are encoded and decoded
 DISC_MSG = "!DISC!"
 CONNECTED = True
 connections = []
-
-"""
-    To implement :
-        ...
-"""
 
 def client_connection(comm_sock, remote_addr):
     global connections
@@ -30,7 +28,7 @@ def client_connection(comm_sock, remote_addr):
     connections.append(user) 
     print(f"Conected with {user['username']}")
     comm_sock.send("Connected with server".encode(FORMAT))
-    comm_sock.send("\nUser connected:\n".encode(FORMAT))
+    comm_sock.send("\nUsers connected:\n".encode(FORMAT))
     for conn in connections:
         comm_sock.send(f" - {conn['username']}\n".encode(FORMAT))
     while True:
@@ -48,6 +46,7 @@ def signal_handler(server, connections, signal, frame):
     handler for SIGINT, closes the server socket and quits the program
 
     :param :server server socket
+    :param :connections list that containes all the connections to the server
     :param :signal type of signal
     :param :frame stack frame, memory zone, which containes datas needed by the executing subroutine
     """
